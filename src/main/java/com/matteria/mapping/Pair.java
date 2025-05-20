@@ -7,12 +7,6 @@ public class Pair<A, B> {
     public final A first;
     public final B second;
 
-    public Pair(A a, B b) {
-        this.value = "default";
-        this.first = a;
-        this.second = b;
-    }
-
     public Pair(String value, A a, B b) {
         this.value = value;
         this.first = a;
