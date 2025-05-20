@@ -112,15 +112,12 @@ class SpringBootStarterMappingApplicationTests {
     @Test
     void testNullObject() {
         contextRunner.run(context -> {
-            Assertions.assertThrows(MappingException.class, () -> {
-                mappingService.map(null, Integer.class);
-            });
-            Assertions.assertThrows(MappingException.class, () -> {
-                mappingService.map(new Object(), null);
-            });
-            Assertions.assertThrows(MappingException.class, () -> {
-                mappingService.map(Set.of(), null);
-            });
+            Assertions.assertThrows(MappingException.class, () ->
+                    mappingService.map(null, Integer.class));
+            Assertions.assertThrows(MappingException.class, () ->
+                    mappingService.map(new Object(), null));
+            Assertions.assertThrows(MappingException.class, () ->
+                    mappingService.map(Set.of(), null));
         });
     }
 
