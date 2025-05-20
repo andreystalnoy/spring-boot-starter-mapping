@@ -1,12 +1,11 @@
-package com.matteria.mapping;
+package com.matteria.mapping.core;
 
-import org.springframework.stereotype.Component;
+import com.matteria.mapping.Pair;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
-@Component
 public class MappingRegistry {
     private final Map<Pair<Class<?>, Class<?>>, Function<?, ?>> registry = new HashMap<>();
 

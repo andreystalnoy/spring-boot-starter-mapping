@@ -1,11 +1,11 @@
 package com.matteria.mapping.configuration;
 
 import com.matteria.mapping.Mapping;
-import org.springframework.stereotype.Component;
+import org.springframework.context.annotation.Configuration;
 
 import java.util.function.Function;
 
-@Component
+@Configuration
 public class MappingConfiguration {
 
     @Mapping
@@ -27,6 +27,5 @@ public class MappingConfiguration {
     public Function<Integer, String> integerToStringPlusOne() {
         return integer -> integer.toString() + 1;
     }
-
 
 }

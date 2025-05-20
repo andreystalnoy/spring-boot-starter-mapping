@@ -71,18 +71,6 @@ public class YourService {
 }
 ```
 
-## Configuration
-
-You can configure the starter using the following properties in your `application.properties` or `application.yml`:
-
-```properties
-# Enable/disable mapping functionality (default: true)
-matteria.mapping.enabled=true
-
-# Set the default mapping value (default: "default")
-matteria.mapping.default-value=default
-```
-
 ## Requirements
 
 - Java 17 or higher

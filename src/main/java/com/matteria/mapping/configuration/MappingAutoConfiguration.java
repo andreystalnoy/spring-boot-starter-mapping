@@ -1,37 +1,35 @@
-package com.matteria.mapping;
+package com.matteria.mapping.configuration;
 
+import com.matteria.mapping.core.MappingAspect;
+import com.matteria.mapping.core.MappingRegistry;
+import com.matteria.mapping.core.MappingService;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 
 @AutoConfiguration
-@ConditionalOnClass(MappingService.class)
-@ConditionalOnProperty(prefix = "matteria.mapping", name = "enabled", havingValue = "true", matchIfMissing = true)
-@EnableConfigurationProperties(MappingProperties.class)
 @EnableAspectJAutoProxy
-@ComponentScan(basePackages = "com.matteria.mapping")
+@ConditionalOnClass(MappingService.class)
 public class MappingAutoConfiguration {
 
-    @Bean
+    @Bean("com.matteria.mapping.core.MappingRegistry")
     @ConditionalOnMissingBean
     public MappingRegistry mappingRegistry() {
         return new MappingRegistry();
     }
 
-    @Bean
+    @Bean("com.matteria.mapping.core.MappingAspect")
     @ConditionalOnMissingBean
     public MappingAspect mappingAspect(MappingRegistry registry) {
         return new MappingAspect(registry);
     }
 
-    @Bean
+    @Bean("com.matteria.mapping.core.MappingService")
     @ConditionalOnMissingBean
-    public MappingService mappingService(MappingRegistry registry, MappingProperties properties) {
-        return new MappingService(registry, properties);
+    public MappingService mappingService(MappingRegistry registry) {
+        return new MappingService(registry);
     }
+
 }
