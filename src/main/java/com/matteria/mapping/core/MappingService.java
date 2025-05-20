@@ -1,5 +1,6 @@
 package com.matteria.mapping;
 
+import com.matteria.mapping.configuration.MappingProperties;
 import org.springframework.stereotype.Component;
 
 import java.util.function.Function;
@@ -7,9 +8,11 @@ import java.util.function.Function;
 @Component
 public class MappingService {
     private final MappingRegistry registry;
+    private final MappingProperties properties;
 
-    public MappingService(MappingRegistry registry) {
+    public MappingService(MappingRegistry registry, MappingProperties properties) {
         this.registry = registry;
+        this.properties = properties;
     }
 
     public <I, O> O map(String value, I input, Class<O> outputClass) {
@@ -24,6 +27,6 @@ public class MappingService {
     }
 
     public <I, O> O map(I input, Class<O> outputClass) {
-        return map("default", input, outputClass);
+        return map(properties.getDefaultValue(), input, outputClass);
     }
 }

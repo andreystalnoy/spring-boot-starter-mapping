@@ -1,0 +1,27 @@
+{
+  "groups": [
+    {
+      "name": "matteria.mapping",
+      "type": "com.matteria.mapping.autoconfigure.MappingProperties",
+      "sourceType": "com.matteria.mapping.autoconfigure.MappingProperties",
+      "description": "Properties for the Mapping starter"
+    }
+  ],
+  "properties": [
+    {
+      "name": "matteria.mapping.enabled",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.matteria.mapping.autoconfigure.MappingProperties",
+      "description": "Enable or disable the mapping functionality",
+      "defaultValue": true
+    },
+    {
+      "name": "matteria.mapping.default-value",
+      "type": "java.lang.String",
+      "sourceType": "com.matteria.mapping.autoconfigure.MappingProperties",
+      "description": "Default mapping value when none is specified",
+      "defaultValue": "default"
+    }
+  ],
+  "hints": []
+}
