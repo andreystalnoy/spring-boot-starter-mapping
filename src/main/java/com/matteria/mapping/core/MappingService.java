@@ -1,11 +1,9 @@
-package com.matteria.mapping;
-
-import org.springframework.stereotype.Component;
+package com.matteria.mapping.core;
 
 import java.util.function.Function;
 
-@Component
 public class MappingService {
+    private static final String  DEFAULT_NAME = "default";
     private final MappingRegistry registry;
 
     public MappingService(MappingRegistry registry) {
@@ -24,6 +22,6 @@ public class MappingService {
     }
 
     public <I, O> O map(I input, Class<O> outputClass) {
-        return map("default", input, outputClass);
+        return map(DEFAULT_NAME, input, outputClass);
     }
 }

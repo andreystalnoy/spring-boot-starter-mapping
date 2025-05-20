@@ -1,17 +1,16 @@
-package com.matteria.mapping;
+package com.matteria.mapping.core;
 
-import org.springframework.stereotype.Component;
+import com.matteria.mapping.Pair;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
-@Component
 public class MappingRegistry {
-    private final Map<Triplet<Class<?>, Class<?>>, Function<?, ?>> registry = new HashMap<>();
+    private final Map<Pair<Class<?>, Class<?>>, Function<?, ?>> registry = new HashMap<>();
 
     public <I, O> void register(String value, Class<?> inputClass, Class<?> outputClass, Function<?, ?> function) {
-        Triplet<Class<?>, Class<?>> key = new Triplet<>(value, inputClass, outputClass);
+        Pair<Class<?>, Class<?>> key = new Pair<>(value, inputClass, outputClass);
         if (registry.containsKey(key)) {
             throw new IllegalStateException("Mapper already registered: " + key);
         }
@@ -20,6 +19,6 @@ public class MappingRegistry {
 
     @SuppressWarnings("unchecked")
     public <I, O> Function<I, O> get(String value, Class<I> inputClass, Class<O> outputClass) {
-        return (Function<I, O>) registry.get(new Triplet<>(value, inputClass, outputClass));
+        return (Function<I, O>) registry.get(new Pair<>(value, inputClass, outputClass));
     }
 }
