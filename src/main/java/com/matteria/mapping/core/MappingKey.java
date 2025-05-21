@@ -1,14 +1,14 @@
-package com.matteria.mapping;
+package com.matteria.mapping.core;
 
 import java.util.Objects;
 
-public class Pair<A, B> {
+public class MappingKey<A, B> {
     private final String value;
     private final A first;
     private final B second;
     private final int hashcode;
 
-    public Pair(String value, A a, B b) {
+    public MappingKey(String value, A a, B b) {
         this.value = value;
         this.first = a;
         this.second = b;
@@ -25,17 +25,17 @@ public class Pair<A, B> {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Pair<?, ?> pair)) return false;
+        if (!(o instanceof MappingKey<?, ?> mappingKey)) return false;
 
-        if (first instanceof Class && pair.first instanceof Class) {
-            if (first != pair.first) return false;
-        } else if (!Objects.equals(first, pair.first)) return false;
+        if (first instanceof Class && mappingKey.first instanceof Class) {
+            if (first != mappingKey.first) return false;
+        } else if (!Objects.equals(first, mappingKey.first)) return false;
 
-        if (second instanceof Class && pair.second instanceof Class) {
-            if (second != pair.second) return false;
-        } else if (!Objects.equals(second, pair.second)) return false;
+        if (second instanceof Class && mappingKey.second instanceof Class) {
+            if (second != mappingKey.second) return false;
+        } else if (!Objects.equals(second, mappingKey.second)) return false;
 
-        return Objects.equals(value, pair.value);
+        return Objects.equals(value, mappingKey.value);
     }
 
     @Override
