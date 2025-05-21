@@ -2,6 +2,8 @@ package com.matteria.mapping;
 
 import com.matteria.mapping.configuration.MappingAutoConfiguration;
 import com.matteria.mapping.configuration.MappingConfiguration;
+import com.matteria.mapping.configuration.model.Address;
+import com.matteria.mapping.configuration.model.Country;
 import com.matteria.mapping.configuration.model.Product;
 import com.matteria.mapping.configuration.model.ProductDto;
 import com.matteria.mapping.core.MappingAspect;
@@ -65,24 +67,31 @@ class SpringBootStarterMappingApplicationTests {
 
     @Test
     void testObjectCollections() {
+        Address address1 = new Address("some street 1", "some city 1", "010020", Country.US);
+        Address address2 = new Address("some street 2", "some city 2", "010020", Country.CANADA);
+        Address address3 = new Address("some street 3", "some city 3", "010020", Country.NEW_ZEALAND);
+
         Set<Product> products = Set.of(
                 new Product(
                         UUID.randomUUID(),
                         "Product 1",
                         "Some description",
-                        new BigDecimal("1.5")
+                        new BigDecimal("1.5"),
+                        address1
                 ),
                 new Product(
                         UUID.randomUUID(),
                         "Product 2",
                         "Some description",
-                        new BigDecimal("2.5")
+                        new BigDecimal("2.5"),
+                        address2
                 ),
                 new Product(
                         UUID.randomUUID(),
                         "Product 3",
                         "Some description",
-                        new BigDecimal("1.8")
+                        new BigDecimal("1.8"),
+                        address3
                 )
         );
 
@@ -103,9 +112,9 @@ class SpringBootStarterMappingApplicationTests {
             Set<Product> productSet = mappingService.map(dtoList, Product.class).toSet();
             Assertions.assertEquals(3, productSet.size());
             Assertions.assertEquals("1.8", productSet.stream()
-                    .filter(it -> it.getPrice().equals(new BigDecimal("1.8"))).findFirst()
+                    .filter(it -> it.price().equals(new BigDecimal("1.8"))).findFirst()
                         .orElseThrow(RuntimeException::new)
-                    .getPrice().toString());
+                    .price().toString());
         });
     }
 

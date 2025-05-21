@@ -26,7 +26,6 @@ public class MappingRegistry {
             return cachedFunction;
         }
 
-        // Fall back to regular lookup if not in cache
         MappingKey<Class<?>, Class<?>> key = new MappingKey<>(value, inputClass, outputClass);
         Function<I, O> function = (Function<I, O>) registry.get(key);
 
