@@ -2,6 +2,8 @@ package com.matteria.mapping;
 
 import com.matteria.mapping.configuration.MappingAutoConfiguration;
 import com.matteria.mapping.configuration.MappingConfiguration;
+import com.matteria.mapping.configuration.model.Address;
+import com.matteria.mapping.configuration.model.Country;
 import com.matteria.mapping.configuration.model.Product;
 import com.matteria.mapping.configuration.model.ProductDto;
 import com.matteria.mapping.core.MappingService;
@@ -152,11 +154,19 @@ class MappingPerformanceTest {
         List<Product> products = createTestProducts(TEST_ITERATIONS);
 
         // Define direct mapping function
+        Function<Address, String> directAddressMapper = address ->  {
+                if (address != null)
+                    return address.formattedAddress();
+                else
+                    return null;
+        };
+
         Function<Product, ProductDto> directMapper = product -> new ProductDto(
-                product.getUuid().toString(),
-                product.getName(),
-                product.getDescription(),
-                product.getPrice().toString()
+                product.uuid().toString(),
+                product.name(),
+                product.description(),
+                product.price().toString(),
+                directAddressMapper.apply(product.address())
         );
 
         // Warmup
@@ -221,12 +231,16 @@ class MappingPerformanceTest {
 
     private List<Product> createTestProducts(int count) {
         List<Product> products = new ArrayList<>(count);
+        Address address1 =
+                new Address("some street 1", "some city", "010020", Country.US);
+
         for (int i = 0; i < count; i++) {
             products.add(new Product(
                     UUID.randomUUID(),
                     "Product " + i,
                     "Description for product " + i,
-                    new BigDecimal(String.format("%.2f", 10 + Math.random() * 100))
+                    new BigDecimal(String.format("%.2f", 10 + Math.random() * 100)),
+                    address1
             ));
         }
         return products;
