@@ -53,6 +53,7 @@ public class MappingService {
         Class<?> commonInputClass = null;
         Function<Object, O> mapper = null;
 
+
         for (I element : input) {
             if (element == null) {
                 result.add(null);
