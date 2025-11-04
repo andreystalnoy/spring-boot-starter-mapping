@@ -7,7 +7,5 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 @Retention(value = RetentionPolicy.RUNTIME)
-@Target({ ElementType.METHOD, ElementType.PARAMETER })
-public @interface Mapping {
-    String value() default "default";
-}
+@Target({ ElementType.TYPE })
+public @interface MappingConfiguration { }

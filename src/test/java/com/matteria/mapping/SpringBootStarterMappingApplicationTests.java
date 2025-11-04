@@ -2,6 +2,8 @@ package com.matteria.mapping;
 
 import com.matteria.mapping.configuration.MappingAutoConfiguration;
 import com.matteria.mapping.configuration.MappingConfiguration;
+import com.matteria.mapping.configuration.model.Address;
+import com.matteria.mapping.configuration.model.Country;
 import com.matteria.mapping.configuration.model.Product;
 import com.matteria.mapping.configuration.model.ProductDto;
 import com.matteria.mapping.core.MappingAspect;
@@ -24,21 +26,19 @@ class SpringBootStarterMappingApplicationTests {
             .withConfiguration(AutoConfigurations.of(
                     MappingAutoConfiguration.class, MappingConfiguration.class));
 
-    private static MappingService mappingService;
-
     @BeforeAll
     static void beforeAll() {
         contextRunner.run(context -> {
             Assertions.assertTrue(context.containsBean(MappingService.class.getName()), "No bean MappingService found");
             Assertions.assertTrue(context.containsBean(MappingAspect.class.getName()), "No bean MappingAspect found");
             Assertions.assertTrue(context.containsBean(MappingRegistry.class.getName()), "No bean MappingRegistry found");
-            mappingService = context.getBean(MappingService.class);
         });
     }
 
     @Test
     void simpleTest() {
         contextRunner.run(context -> {
+            MappingService mappingService = context.getBean(MappingService.class);
             Integer a = mappingService.map("1", Integer.class);
             Assertions.assertEquals(Integer.valueOf(1), a);
 
@@ -54,6 +54,7 @@ class SpringBootStarterMappingApplicationTests {
     void testSimpleCollections() {
         Set<Integer> integers = Set.of(1, 2, 3);
         contextRunner.run(context -> {
+            MappingService mappingService = context.getBean(MappingService.class);
             Set<String> strings = mappingService.map(integers, String.class)
                     .toSet();
             Assertions.assertEquals(3, integers.size());
@@ -65,28 +66,36 @@ class SpringBootStarterMappingApplicationTests {
 
     @Test
     void testObjectCollections() {
+        Address address1 = new Address("some street 1", "some city 1", "010020", Country.US);
+        Address address2 = new Address("some street 2", "some city 2", "010020", Country.CANADA);
+        Address address3 = new Address("some street 3", "some city 3", "010020", Country.NEW_ZEALAND);
+
         Set<Product> products = Set.of(
                 new Product(
                         UUID.randomUUID(),
                         "Product 1",
                         "Some description",
-                        new BigDecimal("1.5")
+                        new BigDecimal("1.5"),
+                        address1
                 ),
                 new Product(
                         UUID.randomUUID(),
                         "Product 2",
                         "Some description",
-                        new BigDecimal("2.5")
+                        new BigDecimal("2.5"),
+                        address2
                 ),
                 new Product(
                         UUID.randomUUID(),
                         "Product 3",
                         "Some description",
-                        new BigDecimal("1.8")
+                        new BigDecimal("1.8"),
+                        address3
                 )
         );
 
         contextRunner.run(context -> {
+            MappingService mappingService = context.getBean(MappingService.class);
             List<ProductDto> dtoList =  mappingService.map(products, ProductDto.class).toList();
             Assertions.assertEquals(3, dtoList.size());
             Assertions.assertEquals("1.8", dtoList.stream()
@@ -103,15 +112,29 @@ class SpringBootStarterMappingApplicationTests {
             Set<Product> productSet = mappingService.map(dtoList, Product.class).toSet();
             Assertions.assertEquals(3, productSet.size());
             Assertions.assertEquals("1.8", productSet.stream()
-                    .filter(it -> it.getPrice().equals(new BigDecimal("1.8"))).findFirst()
+                    .filter(it -> it.price().equals(new BigDecimal("1.8"))).findFirst()
                         .orElseThrow(RuntimeException::new)
-                    .getPrice().toString());
+                    .price().toString());
         });
     }
 
     @Test
     void testNullObject() {
         contextRunner.run(context -> {
+            MappingService mappingService = context.getBean(MappingService.class);
+            Assertions.assertThrows(MappingException.class, () ->
+                    mappingService.map(null, Integer.class));
+            Assertions.assertThrows(MappingException.class, () ->
+                    mappingService.map(new Object(), null));
+            Assertions.assertThrows(MappingException.class, () ->
+                    mappingService.map(Set.of(), null));
+        });
+    }
+
+    @Test
+    void testNullNestedMapping() {
+        contextRunner.run(context -> {
+            MappingService mappingService = context.getBean(MappingService.class);
             Assertions.assertThrows(MappingException.class, () ->
                     mappingService.map(null, Integer.class));
             Assertions.assertThrows(MappingException.class, () ->
