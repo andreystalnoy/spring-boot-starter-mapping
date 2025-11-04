@@ -26,21 +26,19 @@ class SpringBootStarterMappingApplicationTests {
             .withConfiguration(AutoConfigurations.of(
                     MappingAutoConfiguration.class, MappingConfiguration.class));
 
-    private static MappingService mappingService;
-
     @BeforeAll
     static void beforeAll() {
         contextRunner.run(context -> {
             Assertions.assertTrue(context.containsBean(MappingService.class.getName()), "No bean MappingService found");
             Assertions.assertTrue(context.containsBean(MappingAspect.class.getName()), "No bean MappingAspect found");
             Assertions.assertTrue(context.containsBean(MappingRegistry.class.getName()), "No bean MappingRegistry found");
-            mappingService = context.getBean(MappingService.class);
         });
     }
 
     @Test
     void simpleTest() {
         contextRunner.run(context -> {
+            MappingService mappingService = context.getBean(MappingService.class);
             Integer a = mappingService.map("1", Integer.class);
             Assertions.assertEquals(Integer.valueOf(1), a);
 
@@ -56,6 +54,7 @@ class SpringBootStarterMappingApplicationTests {
     void testSimpleCollections() {
         Set<Integer> integers = Set.of(1, 2, 3);
         contextRunner.run(context -> {
+            MappingService mappingService = context.getBean(MappingService.class);
             Set<String> strings = mappingService.map(integers, String.class)
                     .toSet();
             Assertions.assertEquals(3, integers.size());
@@ -96,6 +95,7 @@ class SpringBootStarterMappingApplicationTests {
         );
 
         contextRunner.run(context -> {
+            MappingService mappingService = context.getBean(MappingService.class);
             List<ProductDto> dtoList =  mappingService.map(products, ProductDto.class).toList();
             Assertions.assertEquals(3, dtoList.size());
             Assertions.assertEquals("1.8", dtoList.stream()
@@ -121,6 +121,20 @@ class SpringBootStarterMappingApplicationTests {
     @Test
     void testNullObject() {
         contextRunner.run(context -> {
+            MappingService mappingService = context.getBean(MappingService.class);
+            Assertions.assertThrows(MappingException.class, () ->
+                    mappingService.map(null, Integer.class));
+            Assertions.assertThrows(MappingException.class, () ->
+                    mappingService.map(new Object(), null));
+            Assertions.assertThrows(MappingException.class, () ->
+                    mappingService.map(Set.of(), null));
+        });
+    }
+
+    @Test
+    void testNullNestedMapping() {
+        contextRunner.run(context -> {
+            MappingService mappingService = context.getBean(MappingService.class);
             Assertions.assertThrows(MappingException.class, () ->
                     mappingService.map(null, Integer.class));
             Assertions.assertThrows(MappingException.class, () ->

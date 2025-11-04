@@ -6,6 +6,7 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.springframework.stereotype.Component;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -22,14 +23,33 @@ public class MappingAspect {
         this.registry = registry;
     }
 
-    @Around("@annotation(com.matteria.mapping.Mapping) || execution(* *(.., @com.matteria.mapping.Mapping (*), ..))")
+    @Around("@annotation(com.matteria.mapping.Mapping) || " +
+            "execution(* *(.., @com.matteria.mapping.Mapping (*), ..))")
     public Object interceptMapperMethod(ProceedingJoinPoint joinPoint) throws Throwable {
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         Method method = signature.getMethod();
 
         Object[] args = joinPoint.getArgs();
-        Object[] processedArgs = injectMappersIntoParameters(method, args);
 
+        // Check if this is a method with parameters annotated with @Mapping
+        boolean hasAnnotatedParams = false;
+        Annotation[][] parameterAnnotations = method.getParameterAnnotations();
+        for (int i = 0; i < parameterAnnotations.length; i++) {
+            for (Annotation annotation : parameterAnnotations[i]) {
+                if (annotation instanceof Mapping) {
+                    hasAnnotatedParams = true;
+                    break;
+                }
+            }
+            if (hasAnnotatedParams) break;
+        }
+
+        // Validate that all required mappers exist before proceeding
+        if (hasAnnotatedParams) {
+            validateMappersExist(method, args);
+        }
+
+        Object[] processedArgs = injectMappersIntoParameters(method, args);
         Object result = joinPoint.proceed(processedArgs);
 
         // Register the returned mapper if method has @Mapping annotation
@@ -80,6 +100,33 @@ public class MappingAspect {
                 Class<?> outputClass = getClassFromType(typeArgs[1]);
                 String mappingKey = method.getAnnotation(Mapping.class).value();
                 registry.register(mappingKey, inputClass, outputClass, function);
+            }
+        }
+    }
+
+    private void validateMappersExist(Method method, Object[] args) {
+        Parameter[] parameters = method.getParameters();
+        Annotation[][] parameterAnnotations = method.getParameterAnnotations();
+
+        for (int i = 0; i < parameters.length; i++) {
+            for (Annotation annotation : parameterAnnotations[i]) {
+                if (annotation instanceof Mapping mappingAnnotation) {
+                    String mappingKey = mappingAnnotation.value();
+                    Type paramType = parameters[i].getParameterizedType();
+                    if (paramType instanceof ParameterizedType parameterizedType) {
+                        Type[] typeArgs = parameterizedType.getActualTypeArguments();
+                        if (typeArgs.length == 2) {
+                            Class<?> inputClass = getClassFromType(typeArgs[0]);
+                            Class<?> outputClass = getClassFromType(typeArgs[1]);
+
+                            Function<?, ?> mapper = registry.get(mappingKey, inputClass, outputClass);
+                            if (mapper == null) {
+                                throw new MappingException("No mapper found for " + inputClass.getSimpleName() +
+                                        " to " + outputClass.getSimpleName() + " with key '" + mappingKey + "'");
+                            }
+                        }
+                    }
+                }
             }
         }
     }

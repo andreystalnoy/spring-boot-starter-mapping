@@ -5,7 +5,6 @@ import com.matteria.mapping.configuration.model.Address;
 import com.matteria.mapping.configuration.model.Country;
 import com.matteria.mapping.configuration.model.Product;
 import com.matteria.mapping.configuration.model.ProductDto;
-import com.matteria.mapping.core.MappingService;
 import org.springframework.context.annotation.Configuration;
 
 import java.math.BigDecimal;
@@ -13,6 +12,7 @@ import java.util.UUID;
 import java.util.function.Function;
 
 @Configuration
+@com.matteria.mapping.MappingConfiguration
 public class MappingConfiguration {
 
     @Mapping
